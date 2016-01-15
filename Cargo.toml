@@ -5,3 +5,8 @@ authors = ["Harry Stern <hcs@meow.sh>"]
 
 [dependencies]
 glium = '*'
+nalgebra = '*'
+obj = '*'
+
+[profile.release]
+debug = true

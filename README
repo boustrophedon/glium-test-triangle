@@ -1,1 +1,3 @@
-Just playing around with glium and making triangles or whatever
+Just playing around with glium and making triangles or whatever.
+
+This code is really bad, but it loads an icosohedron .obj that I exported from blender and does simple diffuse shading so that's neat.
