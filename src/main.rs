@@ -58,7 +58,7 @@ fn setup_buffer(window: &glium::backend::glutin_backend::GlutinFacade) -> glium:
         }
     }
 
-    glium::vertex::VertexBuffer::new(window, &data.into_boxed_slice()).unwrap()
+    glium::vertex::VertexBuffer::new(window, &data).unwrap()
 }
 
 fn setup_plane(window: &glium::backend::glutin_backend::GlutinFacade) -> glium::vertex::VertexBuffer<Vert> {
