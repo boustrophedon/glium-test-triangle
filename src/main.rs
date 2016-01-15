@@ -193,12 +193,12 @@ fn main() {
 				Event::KeyboardInput(state, _, key) => {
                     if state == glium::glutin::ElementState::Pressed {
                         match key.unwrap() {
-                            KC::Up => {position = position + Vec3::new(0f32, 0.2f32, 0f32);},
-                            KC::Down => {position = position + Vec3::new(0f32, -0.2f32, 0f32);},
+                            KC::PageUp => {position = position + Vec3::new(0f32, 0.2f32, 0f32);},
+                            KC::PageDown => {position = position + Vec3::new(0f32, -0.2f32, 0f32);},
 							KC::Left => position = position + Vec3::new(-0.2f32, 0f32, 0f32),
 							KC::Right => position = position + Vec3::new(0.2f32, 0f32, 0f32),
-							KC::C => position = position + Vec3::new(0f32, 0f32, -0.2f32),
-							KC::T => position = position + Vec3::new(0f32, 0f32, 0.2f32),
+							KC::Up => position = position + Vec3::new(0f32, 0f32, -0.2f32),
+							KC::Down => position = position + Vec3::new(0f32, 0f32, 0.2f32),
                             KC::Space => {println!("hello");}
                             KC::Escape => {exit = true;},
                             _ => ()
