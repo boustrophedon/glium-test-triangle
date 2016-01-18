@@ -21,7 +21,7 @@ struct Vert {
 
 implement_vertex!(Vert, position, normal, color);
 
-fn setup_buffer(window: &glium::backend::glutin_backend::GlutinFacade) -> glium::vertex::VertexBuffer<Vert> {
+fn setup_icosohedron(window: &glium::backend::glutin_backend::GlutinFacade) -> glium::vertex::VertexBuffer<Vert> {
     let p = Path::new("/home/hcs/code/rust/triangle/meshes/icosohedron.obj");
     let o = obj::load::<SimplePolygon>(p).unwrap();
 
@@ -170,7 +170,7 @@ fn main() {
         .unwrap();
 
 
-    let triangle = setup_buffer(&window);
+    let icosohedron = setup_icosohedron(&window);
     let plane = setup_plane(&window);
     let program = setup_shaders(&window);
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
@@ -232,11 +232,11 @@ fn main() {
                 light_dir: light_dir,
             };
 
-            frame.draw(&triangle, &indices, &program, &uniforms,
+            frame.draw(&icosohedron, &indices, &program, &uniforms,
                                 &params).unwrap();
         }
 
-        // draw plane below tetrahedrons
+        // draw plane below icosohedron
         let scale = 50f32;
         let plane_scale = na::to_homogeneous(&(Mat3::<f32>::new_identity(3)*scale));
         let plane_rot = na::to_homogeneous(&(Iso3::new(Vec3::new(0f32, -1.0, 0.0), Vec3::new(1f32, 0.0, 0.0)*-FRAC_PI_2)));
