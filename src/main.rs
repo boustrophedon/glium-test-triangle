@@ -2,7 +2,6 @@
 #[macro_use] extern crate nalgebra as na;
 extern crate obj;
 
-use std::path::Path;
 use std::f32::consts::{FRAC_PI_2};
 
 use obj::SimplePolygon;
@@ -21,9 +20,10 @@ struct Vert {
 
 implement_vertex!(Vert, position, normal, color);
 
-fn setup_icosohedron(window: &glium::backend::glutin_backend::GlutinFacade) -> glium::vertex::VertexBuffer<Vert> {
-    let p = Path::new("/home/hcs/code/rust/triangle/meshes/icosohedron.obj");
-    let o = obj::load::<SimplePolygon>(p).unwrap();
+fn setup_icosohedron(meshes_dir: String, window: &glium::backend::glutin_backend::GlutinFacade) -> glium::vertex::VertexBuffer<Vert> {
+    let mut p = std::path::PathBuf::from(meshes_dir);
+    p.push("icosohedron.obj");
+    let o = obj::load::<SimplePolygon>(&p).unwrap();
 
     let green = [0f32, 1.0, 0.0];
 
@@ -148,6 +148,15 @@ fn setup_shaders(window: &glium::backend::glutin_backend::GlutinFacade) -> glium
 fn main() {
     use glium::{DisplayBuild,Surface};
 
+
+    let meshes_dir = match std::env::args().nth(1) {
+        Some(dir) => dir,
+        None => {
+            println!("Usage: ./triangle [path_to_meshes_directory]");
+            return;
+        },
+    };
+
     const WIDTH: u32 = 1280;
     const HEIGHT: u32 = 720;
     const ASPECT: f32 = 1.78;
@@ -169,8 +178,7 @@ fn main() {
         .build_glium()
         .unwrap();
 
-
-    let icosohedron = setup_icosohedron(&window);
+    let icosohedron = setup_icosohedron(meshes_dir, &window);
     let plane = setup_plane(&window);
     let program = setup_shaders(&window);
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
