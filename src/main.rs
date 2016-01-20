@@ -29,7 +29,7 @@ fn setup_icosohedron(meshes_dir: String, window: &glium::backend::glutin_backend
 
     let size = o.position().len();
     let mut data = Vec::with_capacity(size);
-    
+
     for ob in o.object_iter() {
         for g in ob.group_iter() {
             for tri in g.indices() {
@@ -109,7 +109,7 @@ fn setup_plane(window: &glium::backend::glutin_backend::GlutinFacade) -> glium::
 
 
 fn setup_shaders(window: &glium::backend::glutin_backend::GlutinFacade) -> glium::program::Program {
-    let v_shader = " 
+    let v_shader = "
         #version 150
 
         uniform mat4 perspective;
@@ -123,23 +123,23 @@ fn setup_shaders(window: &glium::backend::glutin_backend::GlutinFacade) -> glium
 
         out vec3 f_color;
 
-        void main() { 
+        void main() {
             gl_Position = perspective*mv*vec4(position, 1.0);
-            
+
             vec3 mv_normal = normalize(vec3(m_invt * vec4(normal, 0.0)));
             float diffuse = 0.6*max( dot(mv_normal, light_dir), 0.1);
 
             f_color = diffuse*color;
-        } 
+        }
     ";
-    let f_shader = " 
-        #version 150 
+    let f_shader = "
+        #version 150
 
         in vec3 f_color;
 
-        void main() { 
-            gl_FragColor = vec4(f_color, 1.0); 
-        } 
+        void main() {
+            gl_FragColor = vec4(f_color, 1.0);
+        }
     ";
     glium::program::Program::from_source(window, v_shader, f_shader, None).unwrap()
 }
@@ -161,15 +161,15 @@ fn main() {
     const HEIGHT: u32 = 720;
     const ASPECT: f32 = 1.78;
 
-	let params = glium::DrawParameters {
-		backface_culling: glium::draw_parameters::BackfaceCullingMode::CullClockwise,
-		depth: glium::Depth {
-			test: glium::draw_parameters::DepthTest::IfLess,
-			write: true,
-			.. Default::default()
-		},
-		.. Default::default()
-	};
+    let params = glium::DrawParameters {
+        backface_culling: glium::draw_parameters::BackfaceCullingMode::CullClockwise,
+        depth: glium::Depth {
+            test: glium::draw_parameters::DepthTest::IfLess,
+            write: true,
+            .. Default::default()
+        },
+        .. Default::default()
+    };
 
     let window = glium::glutin::WindowBuilder::new()
         .with_dimensions(WIDTH, HEIGHT)
@@ -250,7 +250,7 @@ fn main() {
         let plane_rot = na::to_homogeneous(&(Iso3::new(Vec3::new(0f32, -1.0, 0.0), Vec3::new(1f32, 0.0, 0.0)*-FRAC_PI_2)));
         let plane_model = plane_rot*plane_scale;
         let modelview = view*plane_model;
-        
+
         let uniforms = uniform! {
             perspective: persp.as_ref().clone(),
             mv: modelview.as_ref().clone(),
