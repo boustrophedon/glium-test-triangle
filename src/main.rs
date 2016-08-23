@@ -6,7 +6,7 @@ use std::f32::consts::{FRAC_PI_2};
 
 use obj::SimplePolygon;
 
-use na::{Pnt3, Vec3, Mat3, Iso3, PerspMat3};
+use na::{Point3, Vector3, Matrix3, Isometry3, PerspectiveMatrix3};
 use na::{Eye};
 
 const PI_4: f32 = std::f32::consts::FRAC_PI_4;
@@ -183,11 +183,11 @@ fn main() {
     let program = setup_shaders(&window);
     let indices = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
 
-    let persp = PerspMat3::new(ASPECT, PI_4, 1.0, 100.0).to_mat();
+    let persp = PerspectiveMatrix3::new(ASPECT, PI_4, 1.0, 100.0).to_matrix();
 
-    let mut position = Pnt3::new(0.0f32, 1.0f32, 5.0f32);
-    let dir = Vec3::new(0.0f32, 0.0f32, -1.0f32);
-    let up = Vec3::new(0.0f32, 1.0f32, 0.0f32);
+    let mut position = Point3::new(0.0f32, 1.0f32, 5.0f32);
+    let dir = Vector3::new(0.0f32, 0.0f32, -1.0f32);
+    let up = Vector3::new(0.0f32, 1.0f32, 0.0f32);
 
     let mut t = 0f32;
 
@@ -201,12 +201,12 @@ fn main() {
 				Event::KeyboardInput(state, _, key) => {
                     if state == glium::glutin::ElementState::Pressed {
                         match key.unwrap() {
-                            KC::PageUp => {position = position + Vec3::new(0f32, 0.2f32, 0f32);},
-                            KC::PageDown => {position = position + Vec3::new(0f32, -0.2f32, 0f32);},
-							KC::Left => position = position + Vec3::new(-0.2f32, 0f32, 0f32),
-							KC::Right => position = position + Vec3::new(0.2f32, 0f32, 0f32),
-							KC::Up => position = position + Vec3::new(0f32, 0f32, -0.2f32),
-							KC::Down => position = position + Vec3::new(0f32, 0f32, 0.2f32),
+                            KC::PageUp => {position = position + Vector3::new(0f32, 0.2f32, 0f32);},
+                            KC::PageDown => {position = position + Vector3::new(0f32, -0.2f32, 0f32);},
+							KC::Left => position = position + Vector3::new(-0.2f32, 0f32, 0f32),
+							KC::Right => position = position + Vector3::new(0.2f32, 0f32, 0f32),
+							KC::Up => position = position + Vector3::new(0f32, 0f32, -0.2f32),
+							KC::Down => position = position + Vector3::new(0f32, 0f32, 0.2f32),
                             KC::Space => {println!("hello");}
                             KC::Escape => {exit = true;},
                             _ => ()
@@ -223,20 +223,20 @@ fn main() {
         frame.clear_color_and_depth((0.0, 0.0, 0.0, 1.0), 1.0);
 
         // camera
-        let view = na::inv(&Iso3::look_at_z(&position, &(position + dir), &up)).unwrap();
+        let view = Isometry3::look_at_rh(&position, &(position + dir), &up);
         let view = na::to_homogeneous(&view);
         let light_dir = [0.5, 0.866025, 0f32];
 
         // draw tetrahedrons
         for i in 0..10 {
-            let model = Iso3::new(Vec3::new(0f32, 0.0, -5f32*i as f32), Vec3::new(0f32, 1.0, 0.0) * t);
+            let model = Isometry3::new(Vector3::new(0f32, 0.0, -5f32*i as f32), Vector3::new(0f32, 1.0, 0.0) * t);
             let model = na::to_homogeneous(&model);
             let modelview = view*model;
 
             let uniforms = uniform! {
                 perspective: persp.as_ref().clone(),
                 mv: modelview.as_ref().clone(),
-                m_invt: na::transpose(&na::inv(&model).unwrap()).as_ref().clone(),
+                m_invt: na::transpose(&na::inverse(&model).unwrap()).as_ref().clone(),
                 light_dir: light_dir,
             };
 
@@ -246,15 +246,15 @@ fn main() {
 
         // draw plane below icosohedron
         let scale = 50f32;
-        let plane_scale = na::to_homogeneous(&(Mat3::<f32>::new_identity(3)*scale));
-        let plane_rot = na::to_homogeneous(&(Iso3::new(Vec3::new(0f32, -1.0, 0.0), Vec3::new(1f32, 0.0, 0.0)*-FRAC_PI_2)));
+        let plane_scale = na::to_homogeneous(&(Matrix3::<f32>::new_identity(3)*scale));
+        let plane_rot = na::to_homogeneous(&(Isometry3::new(Vector3::new(0f32, -1.0, 0.0), Vector3::new(1f32, 0.0, 0.0)*-FRAC_PI_2)));
         let plane_model = plane_rot*plane_scale;
         let modelview = view*plane_model;
 
         let uniforms = uniform! {
             perspective: persp.as_ref().clone(),
             mv: modelview.as_ref().clone(),
-            m_invt: na::transpose(&na::inv(&plane_model).unwrap()).as_ref().clone(),
+            m_invt: na::transpose(&na::inverse(&plane_model).unwrap()).as_ref().clone(),
             light_dir: light_dir,
         };
         frame.draw(&plane, &indices, &program, &uniforms,
